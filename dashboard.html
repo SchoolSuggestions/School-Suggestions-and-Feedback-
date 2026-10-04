@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex,nofollow" />
-<title>لوحة الموجهة الطلابية — الاقتراحات والشكاوى</title>
+<title>لوحة الإرشاد الطلابي — الاقتراحات والشكاوى</title>
 <link rel="stylesheet" href="style.css" />
 <link rel="stylesheet" href="theme.css" />
 </head>
@@ -15,16 +15,16 @@
     <div class="letterhead-text">
       <div class="kicker">المملكة العربية السعودية · وزارة التعليم</div>
       <h1>لوحة الاقتراحات والشكاوى</h1>
-      <p>خاصة بالموجهة الطلابية — غير مخصصة لأولياء الأمور</p>
+      <p>خاصة بالإرشاد الطلابي — غير مخصصة لأولياء الأمور</p>
     </div>
   </div></div>
 
   <div class="card gate" id="gate">
     <p class="card-title">الدخول إلى اللوحة</p>
-    <p class="card-sub">أدخلي رمز الدخول.</p>
+    <p class="card-sub">يرجى إدخال رمز الدخول.</p>
     <div class="field"><label for="pin">رمز الدخول</label><input type="password" id="pin" autocomplete="current-password" /></div>
     <button class="btn btn-primary" id="gateBtn" style="width:100%">دخول</button>
-    <div class="gate-msg" id="gateMsg">رمز الدخول غير صحيح.</div>
+    <div class="gate-msg" id="gateMsg">رمز الدخول غير صحيح. يرجى التأكد منه والمحاولة مرة أخرى.</div>
   </div>
 
   <div id="app" class="hidden">
@@ -47,7 +47,7 @@
 </div>
 
 <script>
-const URL_API = "https://script.google.com/macros/library/d/1lwiYBOnE2nFUsVcJa1s3EEuQH_B8x3raEmYeQT96TbGQgxBt1EF6yfPL/3هنا";
+const URL_API = "ضع_رابط_Apps_Script_هنا";
 let KEY='', all=[], timer=null;
 const $=id=>document.getElementById(id);
 const ST={new:'جديدة',progress:'قيد المعالجة',done:'تمت المعالجة'};
@@ -59,15 +59,24 @@ async function post(o){ const r=await fetch(URL_API,{method:'POST',headers:{'Con
 async function load(pin){
   try{
     const r=await (await fetch(URL_API+'?key='+encodeURIComponent(pin))).json();
-    if(r.status!=='ok') return false;
+    if(r.status==='unauthorized') return 'bad';
+    if(r.status!=='ok') return 'err';
     all=r.records||[]; render(); return true;
-  }catch{ return false; }
+  }catch{ return 'err'; }
 }
 async function unlock(){
   const pin=$('pin').value.trim(); if(!pin) return;
   $('gateMsg').classList.remove('show');
-  if(await load(pin)){ KEY=pin; $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); timer=setInterval(()=>load(KEY),30000); }
-  else $('gateMsg').classList.add('show');
+  $('gateBtn').disabled=true;
+  const ok=await load(pin);
+  $('gateBtn').disabled=false;
+  if(ok===true){ KEY=pin; $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); timer=setInterval(()=>load(KEY),30000); }
+  else{
+    $('gateMsg').textContent = ok==='bad'
+      ? 'رمز الدخول غير صحيح. يرجى التأكد منه والمحاولة مرة أخرى.'
+      : 'تعذّر الاتصال بالخادم. تأكد من رابط Apps Script في الملف ومن نشره بنسخة جديدة وصلاحية Anyone.';
+    $('gateMsg').classList.add('show');
+  }
 }
 $('gateBtn').onclick=unlock; $('pin').onkeydown=e=>{ if(e.key==='Enter') unlock(); };
 
@@ -80,7 +89,7 @@ function render(){
   let rows=all.filter(r=>(!s||r.school===s)&&(!t||r.type===t)&&(!st||r.status===st)&&(!q||(r.text+r.id+r.parentName).includes(q)));
   rows.sort((a,b)=>(a.status==='done')-(b.status==='done')||String(b.date).localeCompare(String(a.date)));
   if(!all.length){ $('list').innerHTML='<div class="empty-state"><b>لا توجد رسائل بعد</b><br>ستظهر هنا فور وصولها.</div>'; return; }
-  if(!rows.length){ $('list').innerHTML='<div class="empty-state">لا نتائج مطابقة. عدّلي البحث أو الفلاتر.</div>'; return; }
+  if(!rows.length){ $('list').innerHTML='<div class="empty-state">لا نتائج مطابقة. يمكن تعديل البحث أو الفلاتر.</div>'; return; }
   const open=new Set([...document.querySelectorAll('.body.open')].map(e=>e.id));
   $('list').innerHTML=rows.map(r=>`
   <div class="item" style="--sc:${SC[r.status]||'#999'}">

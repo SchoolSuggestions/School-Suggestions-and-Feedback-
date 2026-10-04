@@ -3,8 +3,8 @@
  * يُلصق كاملاً في Apps Script المرتبط بجدول Google Sheets جديد.
  * بعد أي تعديل: Deploy > Manage deployments > القلم > Version: New version > Deploy
  */
-const ACCESS_KEY = 'غيّري_هذا_الرمز';   // رمز دخول اللوحة — اختاري رمزًا جديدًا وقويًا
-const ALERT_EMAIL = 'ضعي_البريد_هنا@gmail.com';
+const ACCESS_KEY = 'غيّر_هذا_الرمز';   // رمز دخول اللوحة — يُختار رمز جديد وقوي
+const ALERT_EMAIL = 'ضع_البريد_هنا@gmail.com';
 const SHEET_NAME = 'Messages';
 const DRIVE_FOLDER_NAME = 'مرفقات الاقتراحات والشكاوى';
 const SCHOOLS = ['المتوسطة التاسعة والستون', 'المتوسطة الثانية لتحفيظ القرآن'];
@@ -57,7 +57,7 @@ function doPost(e) {
     if (d.type === 'شكوى') {
       MailApp.sendEmail(ALERT_EMAIL, 'شكوى جديدة — ' + d.school + ' — ' + ref,
         'وصلت شكوى جديدة إلى ' + d.school + '\nالرقم المرجعي: ' + ref +
-        '\nالتصنيف: ' + (d.category || 'غير محدد') + '\n\nيرجى مراجعة لوحة الموجهة الطلابية.');
+        '\nالتصنيف: ' + (d.category || 'غير محدد') + '\n\nيرجى مراجعة لوحة الإرشاد الطلابي.');
     }
     return out({ status: 'ok', ref: ref });
   } catch (err) {

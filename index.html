@@ -21,8 +21,8 @@
   </div>
 
   <div class="card">
-    <p class="card-title">أرسلي رأيك للمدرسة</p>
-    <p class="card-sub">تصل رسالتك مباشرة إلى الموجهة الطلابية، ولا يطّلع عليها غيرها. سنتابعها ونعطيك رقمًا مرجعيًا بعد الإرسال.</p>
+    <p class="card-title">شاركنا رأيك</p>
+    <p class="card-sub">تصل رسالتك مباشرة إلى الإرشاد الطلابي، ولا يطّلع عليها غيره. سنتابعها ونعطيك رقمًا مرجعيًا بعد الإرسال.</p>
 
     <div class="privacy-box">لحماية الخصوصية: لا نطلب اسم الطالبة ولا رقم الهوية. اسمك ووسيلة التواصل اختياريان، وإن تركتهما فارغين تصل الرسالة دون أي بيانات شخصية.</div>
 
@@ -65,7 +65,7 @@
 
       <div class="field">
         <label for="text">نص الرسالة <span class="req">*</span></label>
-        <textarea id="text" rows="6" maxlength="2000" placeholder="اكتبي التفاصيل بوضوح قدر الإمكان" required></textarea>
+        <textarea id="text" rows="6" maxlength="2000" placeholder="يرجى كتابة التفاصيل بوضوح قدر الإمكان" required></textarea>
         <div class="counter"><span id="cnt">0</span> / 2000</div>
       </div>
 
@@ -76,7 +76,7 @@
         </div>
         <div class="field">
           <label for="contact">رقم التواصل</label>
-          <input type="text" id="contact" maxlength="30" inputmode="tel" placeholder="اختياري، فقط إذا رغبتِ بالرد" />
+          <input type="text" id="contact" maxlength="30" inputmode="tel" placeholder="اختياري، عند الرغبة بالرد" />
         </div>
       </div>
 
@@ -91,7 +91,7 @@
       <button type="submit" class="btn btn-primary" id="btn">إرسال الرسالة</button>
       <div class="msg" id="msg" role="alert"></div>
       <div class="ref-box" id="ref">
-        <p>تم استلام رسالتك. احتفظي بالرقم المرجعي للمتابعة مع المدرسة:</p>
+        <p>تم استلام رسالتك. يرجى الاحتفاظ بالرقم المرجعي للمتابعة مع المدرسة:</p>
         <div class="code" id="refCode"></div>
         <p>شكرًا لمشاركتك.</p>
       </div>
@@ -103,7 +103,7 @@
 </div>
 
 <script>
-const URL_API = "https://script.google.com/macros/library/d/1lwiYBOnE2nFUsVcJa1s3EEuQH_B8x3raEmYeQT96TbGQgxBt1EF6yfPL/3";
+const URL_API = "ضع_رابط_Apps_Script_هنا";
 const MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const $ = id => document.getElementById(id);
 
@@ -137,7 +137,7 @@ $('f').addEventListener('submit',async e=>{
   if(f){
     if(f.size>5*1024*1024) return say('حجم الملف أكبر من ٥ ميجابايت. يرجى اختيار ملف أصغر.','err');
     try{ p.fileBase64=await toB64(f); p.fileName=f.name; p.fileMime=f.type||'application/octet-stream'; }
-    catch{ return say('تعذّرت قراءة الملف. جرّبي ملفًا آخر أو أرسلي بدون مرفق.','err'); }
+    catch{ return say('تعذّرت قراءة الملف. يمكن تجربة ملف آخر أو الإرسال بدون مرفق.','err'); }
   }
   $('btn').disabled=true; $('btn').textContent='جارٍ الإرسال...';
   try{
@@ -148,7 +148,7 @@ $('f').addEventListener('submit',async e=>{
     $('f').reset(); $('date').value=today(); showDate(); $('cnt').textContent='0';
     document.querySelectorAll('.type-opt').forEach(l=>l.classList.remove('checked'));
     $('ref').scrollIntoView({behavior:'smooth',block:'center'});
-  }catch{ say('تعذّر الاتصال. تحققي من الإنترنت وحاولي مرة أخرى.','err'); }
+  }catch{ say('تعذّر الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.','err'); }
   finally{ $('btn').disabled=false; $('btn').textContent='إرسال الرسالة'; }
 });
 </script>
