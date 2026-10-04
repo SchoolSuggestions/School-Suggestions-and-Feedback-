@@ -1,0 +1,124 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>لوحة الموجهة الطلابية — الاقتراحات والشكاوى</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+<div class="shell">
+  <div class="letterhead"><div class="letterhead-row">
+    <div class="logo-slot"><img src="moe-logo.png" alt="شعار وزارة التعليم" onerror="this.style.display='none'" /></div>
+    <div class="letterhead-text">
+      <div class="kicker">المملكة العربية السعودية · وزارة التعليم</div>
+      <h1>لوحة الاقتراحات والشكاوى</h1>
+      <p>خاصة بالموجهة الطلابية — غير مخصصة لأولياء الأمور</p>
+    </div>
+  </div></div>
+
+  <div class="card gate" id="gate">
+    <p class="card-title">الدخول إلى اللوحة</p>
+    <p class="card-sub">أدخلي رمز الدخول.</p>
+    <div class="field"><label for="pin">رمز الدخول</label><input type="password" id="pin" autocomplete="current-password" /></div>
+    <button class="btn btn-primary" id="gateBtn" style="width:100%">دخول</button>
+    <div class="gate-msg" id="gateMsg">رمز الدخول غير صحيح.</div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="s-new">—</div><div class="label">جديدة (لم تُعالج)</div></div>
+      <div class="stat-card"><div class="value" id="s-comp">—</div><div class="label">شكاوى</div></div>
+      <div class="stat-card"><div class="value" id="s-sug">—</div><div class="label">اقتراحات</div></div>
+      <div class="stat-card"><div class="value" id="s-all">—</div><div class="label">إجمالي الرسائل</div></div>
+    </div>
+    <div class="filters-row">
+      <input type="text" id="q" placeholder="بحث في النص أو الرقم المرجعي..." />
+      <select id="fSchool"><option value="">كل المدارس</option><option>المتوسطة التاسعة والستون</option><option>المتوسطة الثانية لتحفيظ القرآن</option></select>
+      <select id="fType"><option value="">الكل</option><option>شكوى</option><option>اقتراح</option></select>
+      <select id="fStatus"><option value="">كل الحالات</option><option value="new">جديدة</option><option value="progress">قيد المعالجة</option><option value="done">تمت المعالجة</option></select>
+      <button class="btn btn-ghost" id="refresh">↻ تحديث</button>
+    </div>
+    <div id="list"><div class="empty-state">جارٍ التحميل...</div></div>
+  </div>
+  <p class="credit-line">بفكرة من حياة الحربي، وتنفيذ WebCraft</p>
+</div>
+
+<script>
+const URL_API = "ضعي_رابط_Apps_Script_هنا";
+let KEY='', all=[], timer=null;
+const $=id=>document.getElementById(id);
+const ST={new:'جديدة',progress:'قيد المعالجة',done:'تمت المعالجة'};
+const SC={new:'var(--orange)',progress:'var(--yellow)',done:'var(--green)'};
+const esc=s=>{const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;};
+
+async function post(o){ const r=await fetch(URL_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({...o,key:KEY})}); return r.json(); }
+
+async function load(pin){
+  try{
+    const r=await (await fetch(URL_API+'?key='+encodeURIComponent(pin))).json();
+    if(r.status!=='ok') return false;
+    all=r.records||[]; render(); return true;
+  }catch{ return false; }
+}
+async function unlock(){
+  const pin=$('pin').value.trim(); if(!pin) return;
+  $('gateMsg').classList.remove('show');
+  if(await load(pin)){ KEY=pin; $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); timer=setInterval(()=>load(KEY),30000); }
+  else $('gateMsg').classList.add('show');
+}
+$('gateBtn').onclick=unlock; $('pin').onkeydown=e=>{ if(e.key==='Enter') unlock(); };
+
+function render(){
+  $('s-new').textContent=all.filter(r=>r.status==='new').length;
+  $('s-comp').textContent=all.filter(r=>r.type==='شكوى').length;
+  $('s-sug').textContent=all.filter(r=>r.type==='اقتراح').length;
+  $('s-all').textContent=all.length;
+  const q=$('q').value.trim(), s=$('fSchool').value, t=$('fType').value, st=$('fStatus').value;
+  let rows=all.filter(r=>(!s||r.school===s)&&(!t||r.type===t)&&(!st||r.status===st)&&(!q||(r.text+r.id+r.parentName).includes(q)));
+  rows.sort((a,b)=>(a.status==='done')-(b.status==='done')||String(b.date).localeCompare(String(a.date)));
+  if(!all.length){ $('list').innerHTML='<div class="empty-state"><b>لا توجد رسائل بعد</b><br>ستظهر هنا فور وصولها.</div>'; return; }
+  if(!rows.length){ $('list').innerHTML='<div class="empty-state">لا نتائج مطابقة. عدّلي البحث أو الفلاتر.</div>'; return; }
+  const open=new Set([...document.querySelectorAll('.body.open')].map(e=>e.id));
+  $('list').innerHTML=rows.map(r=>`
+  <div class="item" style="--sc:${SC[r.status]||'#999'}">
+    <div class="item-head" onclick="document.getElementById('b-${r.id}').classList.toggle('open')">
+      <div style="min-width:0">
+        <div class="tags">
+          <span class="tag ${r.type==='شكوى'?'complaint':'suggestion'}">${esc(r.type)}</span>
+          <span class="tag" style="color:${r.school.includes('الثانية')?'var(--school2)':'var(--school69)'}">${esc(r.school)}</span>
+          ${r.category?`<span class="tag">${esc(r.category)}</span>`:''}
+        </div>
+        <p class="preview">${esc(r.text.length>110?r.text.slice(0,110)+'…':r.text)}</p>
+        <div class="meta">${esc(r.date)} · رقم: ${esc(r.id)}</div>
+      </div>
+      <span class="st ${r.status}">${ST[r.status]||r.status}</span>
+    </div>
+    <div class="body ${open.has('b-'+r.id)?'open':''}" id="b-${r.id}">
+      <div class="full">${esc(r.text)}</div>
+      <div class="meta" style="margin-top:8px">ولي الأمر: ${esc(r.parentName)||'<i>لم يذكر</i>'} · التواصل: ${esc(r.contact)||'<i>لم يذكر</i>'}
+        ${r.fileUrl?` · <a href="${esc(r.fileUrl)}" target="_blank" rel="noopener" style="color:var(--forest-500);font-weight:700">عرض المرفق</a>`:''}</div>
+      <div class="actions">
+        <select id="s-${r.id}">${Object.entries(ST).map(([k,v])=>`<option value="${k}" ${k===r.status?'selected':''}>${v}</option>`).join('')}</select>
+        <input type="text" id="n-${r.id}" placeholder="ملاحظة داخلية (لا تظهر لولي الأمر)" value="${esc(r.note).replace(/"/g,'&quot;')}" />
+        <button class="mini" onclick="save('${r.id}')">حفظ</button>
+        <button class="mini del" onclick="del('${r.id}')">حذف</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+async function save(id){
+  try{ const r=await post({action:'update',id,status:$('s-'+id).value,note:$('n-'+id).value});
+    if(r.status==='ok') load(KEY); else alert('تعذّر الحفظ.'); }catch{ alert('تعذّر الاتصال.'); }
+}
+async function del(id){
+  if(!confirm('حذف هذه الرسالة نهائيًا؟ لا يمكن التراجع.')) return;
+  try{ const r=await post({action:'delete',id}); if(r.status==='ok') load(KEY); else alert('تعذّر الحذف.'); }catch{ alert('تعذّر الاتصال.'); }
+}
+['q','fSchool','fType','fStatus'].forEach(i=>$(i).addEventListener('input',render));
+$('refresh').onclick=()=>load(KEY);
+</script>
+</body>
+</html>

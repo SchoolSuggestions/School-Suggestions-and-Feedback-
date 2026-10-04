@@ -1,0 +1,156 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>الاقتراحات والشكاوى — المتوسطة التاسعة والستون والمتوسطة الثانية لتحفيظ القرآن</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+<div class="shell">
+  <div class="letterhead">
+    <div class="letterhead-row">
+      <div class="logo-slot"><img src="moe-logo.png" alt="شعار وزارة التعليم" onerror="this.style.display='none'" /></div>
+      <div class="letterhead-text">
+        <div class="kicker">المملكة العربية السعودية · وزارة التعليم</div>
+        <h1>الاقتراحات والشكاوى</h1>
+        <p>المتوسطة التاسعة والستون · المتوسطة الثانية لتحفيظ القرآن</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="card-title">أرسلي رأيك للمدرسة</p>
+    <p class="card-sub">تصل رسالتك مباشرة إلى الموجهة الطلابية، ولا يطّلع عليها غيرها. سنتابعها ونعطيك رقمًا مرجعيًا بعد الإرسال.</p>
+
+    <div class="privacy-box">لحماية الخصوصية: لا نطلب اسم الطالبة ولا رقم الهوية. اسمك ووسيلة التواصل اختياريان، وإن تركتهما فارغين تصل الرسالة دون أي بيانات شخصية.</div>
+
+    <form id="f" novalidate>
+      <div class="field">
+        <label>نوع الرسالة <span class="req">*</span></label>
+        <div class="type-row" id="typeRow">
+          <label class="type-opt"><input type="radio" name="type" value="اقتراح" /><b>اقتراح</b><small>فكرة لتطوير المدرسة</small></label>
+          <label class="type-opt"><input type="radio" name="type" value="شكوى" /><b>شكوى</b><small>ملاحظة تحتاج معالجة</small></label>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="school">المدرسة <span class="req">*</span></label>
+          <select id="school" required>
+            <option value="" disabled selected>-- اختيار المدرسة --</option>
+            <option>المتوسطة التاسعة والستون</option>
+            <option>المتوسطة الثانية لتحفيظ القرآن</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="date">التاريخ <span class="req">*</span></label>
+          <div class="date-wrap">
+            <input type="date" id="date" required />
+            <span class="date-display" id="dateDisplay"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="cat">التصنيف</label>
+        <select id="cat">
+          <option value="">-- اختياري --</option>
+          <option>التعليم والمناهج</option><option>الإدارة والخدمات</option>
+          <option>السلوك والتعامل</option><option>الأمن والسلامة</option>
+          <option>المرافق والنظافة</option><option>الأنشطة</option><option>أخرى</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="text">نص الرسالة <span class="req">*</span></label>
+        <textarea id="text" rows="6" maxlength="2000" placeholder="اكتبي التفاصيل بوضوح قدر الإمكان" required></textarea>
+        <div class="counter"><span id="cnt">0</span> / 2000</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="name">اسم ولي الأمر</label>
+          <input type="text" id="name" maxlength="80" placeholder="اختياري" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="contact">رقم التواصل</label>
+          <input type="text" id="contact" maxlength="30" inputmode="tel" placeholder="اختياري، فقط إذا رغبتِ بالرد" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="file">إرفاق ملف</label>
+        <div class="hint">صورة أو PDF، بحد أقصى ٥ ميجابايت</div>
+        <input type="file" id="file" accept="image/*,.pdf" />
+      </div>
+
+      <div class="hp" aria-hidden="true"><input type="text" id="website" tabindex="-1" autocomplete="off" /></div>
+
+      <button type="submit" class="btn btn-primary" id="btn">إرسال الرسالة</button>
+      <div class="msg" id="msg" role="alert"></div>
+      <div class="ref-box" id="ref">
+        <p>تم استلام رسالتك. احتفظي بالرقم المرجعي للمتابعة مع المدرسة:</p>
+        <div class="code" id="refCode"></div>
+        <p>شكرًا لمشاركتك.</p>
+      </div>
+    </form>
+  </div>
+
+  <p class="footer-note">تُستخدم هذه الرسائل لأغراض التطوير والمتابعة المدرسية فقط.</p>
+  <p class="credit-line">بفكرة من حياة الحربي، وتنفيذ WebCraft</p>
+</div>
+
+<script>
+const URL_API = "ضعي_رابط_Apps_Script_هنا";
+const MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const $ = id => document.getElementById(id);
+
+function showDate(){
+  const v=$('date').value; if(!v){ $('dateDisplay').textContent=''; return; }
+  const [y,m,d]=v.split('-').map(Number); $('dateDisplay').textContent=`${d} ${MONTHS[m-1]} ${y}`;
+}
+const today=()=>{ const n=new Date(); return new Date(n-n.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+$('date').value=today(); $('date').max=today(); showDate();
+$('date').addEventListener('input',showDate); $('date').addEventListener('change',showDate);
+
+document.querySelectorAll('.type-opt input').forEach(r=>r.addEventListener('change',()=>{
+  document.querySelectorAll('.type-opt').forEach(l=>l.classList.toggle('checked',l.querySelector('input').checked));
+}));
+$('text').addEventListener('input',()=>$('cnt').textContent=$('text').value.length);
+
+const toB64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(',')[1]);r.onerror=no;r.readAsDataURL(f);});
+function say(t,c){ $('msg').textContent=t; $('msg').className='msg show '+c; }
+
+$('f').addEventListener('submit',async e=>{
+  e.preventDefault(); $('msg').className='msg'; $('ref').classList.remove('show');
+  const type=(document.querySelector('input[name=type]:checked')||{}).value;
+  const p={ type, school:$('school').value, date:$('date').value, category:$('cat').value,
+    text:$('text').value.trim(), parentName:$('name').value.trim(), contact:$('contact').value.trim(),
+    website:$('website').value, fileBase64:'', fileName:'', fileMime:'' };
+  if(!type) return say('يرجى اختيار نوع الرسالة: اقتراح أو شكوى.','err');
+  if(!p.school) return say('يرجى اختيار المدرسة.','err');
+  if(!p.date) return say('يرجى تحديد التاريخ.','err');
+  if(p.text.length<10) return say('يرجى كتابة نص الرسالة (١٠ أحرف على الأقل).','err');
+  const f=$('file').files[0];
+  if(f){
+    if(f.size>5*1024*1024) return say('حجم الملف أكبر من ٥ ميجابايت. يرجى اختيار ملف أصغر.','err');
+    try{ p.fileBase64=await toB64(f); p.fileName=f.name; p.fileMime=f.type||'application/octet-stream'; }
+    catch{ return say('تعذّرت قراءة الملف. جرّبي ملفًا آخر أو أرسلي بدون مرفق.','err'); }
+  }
+  $('btn').disabled=true; $('btn').textContent='جارٍ الإرسال...';
+  try{
+    const res=await fetch(URL_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});
+    const r=await res.json();
+    if(r.status!=='ok') return say('تعذّر الإرسال. يرجى المحاولة مرة أخرى.','err');
+    $('refCode').textContent=r.ref; $('ref').classList.add('show');
+    $('f').reset(); $('date').value=today(); showDate(); $('cnt').textContent='0';
+    document.querySelectorAll('.type-opt').forEach(l=>l.classList.remove('checked'));
+    $('ref').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch{ say('تعذّر الاتصال. تحققي من الإنترنت وحاولي مرة أخرى.','err'); }
+  finally{ $('btn').disabled=false; $('btn').textContent='إرسال الرسالة'; }
+});
+</script>
+</body>
+</html>
