@@ -18,10 +18,6 @@ body{ background-image:none !important; background:linear-gradient(180deg,#ECE9F
 .counter{ font-size:11px; color:var(--ink-soft); text-align:left; }
 .privacy-box{ background:var(--gold-050); border:1px solid #EBDDB4; border-radius:10px; padding:11px 14px; font-size:12px; line-height:1.8; color:var(--gold-dark); margin-bottom:18px; }
 .hp{ position:absolute; left:-9999px; height:0; overflow:hidden; }
-.ref-box{ margin-top:16px; padding:18px; border-radius:12px; background:var(--green-bg); border:1px solid #CBE7CF; text-align:center; display:none; }
-.ref-box.show{ display:block; }
-.ref-box .code{ font-size:26px; font-weight:800; letter-spacing:3px; color:var(--forest-900); direction:ltr; margin:6px 0; }
-.ref-box p{ margin:0; font-size:12.5px; color:var(--ink-soft); line-height:1.8; }
 /* dashboard */
 .stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
 @media(max-width:700px){ .stats-grid{ grid-template-columns:repeat(2,1fr); } }

@@ -8,4 +8,4 @@
 5. رفع الملفات إلى مستودع GitHub جديد وتفعيل GitHub Pages.
 
 ## الملفات
-`index.html` (النموذج) · `dashboard.html` (لوحة الإرشاد) · `style.css` (نفس ملف الغياب) · `theme.css` (الهوية البنفسجية) · `moe-logo.png` · `apps-script.gs`
+`index.html` (النموذج) · `dashboard.html` (لوحة التوجيه) · `style.css` (نفس ملف الغياب) · `theme.css` (الهوية البنفسجية) · `moe-logo.png` · `apps-script.gs`

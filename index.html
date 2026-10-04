@@ -22,7 +22,7 @@
 
   <div class="card">
     <p class="card-title">شاركنا رأيك</p>
-    <p class="card-sub">تصل رسالتك مباشرة إلى الإرشاد الطلابي، ولا يطّلع عليها غيره. سنتابعها ونعطيك رقمًا مرجعيًا بعد الإرسال.</p>
+    <p class="card-sub">تصل رسالتك مباشرة إلى التوجيه الطلابي، ولا يطّلع عليها غيره. سنتابعها ونأخذها بعين الاعتبار.</p>
 
     <div class="privacy-box">لحماية الخصوصية: لا نطلب اسم الطالبة ولا رقم الهوية. اسمك ووسيلة التواصل اختياريان، وإن تركتهما فارغين تصل الرسالة دون أي بيانات شخصية.</div>
 
@@ -90,11 +90,6 @@
 
       <button type="submit" class="btn btn-primary" id="btn">إرسال الرسالة</button>
       <div class="msg" id="msg" role="alert"></div>
-      <div class="ref-box" id="ref">
-        <p>تم استلام رسالتك. يرجى الاحتفاظ بالرقم المرجعي للمتابعة مع المدرسة:</p>
-        <div class="code" id="refCode"></div>
-        <p>شكرًا لمشاركتك.</p>
-      </div>
     </form>
   </div>
 
@@ -124,7 +119,7 @@ const toB64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.
 function say(t,c){ $('msg').textContent=t; $('msg').className='msg show '+c; }
 
 $('f').addEventListener('submit',async e=>{
-  e.preventDefault(); $('msg').className='msg'; $('ref').classList.remove('show');
+  e.preventDefault(); $('msg').className='msg';
   const type=(document.querySelector('input[name=type]:checked')||{}).value;
   const p={ type, school:$('school').value, date:$('date').value, category:$('cat').value,
     text:$('text').value.trim(), parentName:$('name').value.trim(), contact:$('contact').value.trim(),
@@ -144,10 +139,10 @@ $('f').addEventListener('submit',async e=>{
     const res=await fetch(URL_API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});
     const r=await res.json();
     if(r.status!=='ok') return say('تعذّر الإرسال. يرجى المحاولة مرة أخرى.','err');
-    $('refCode').textContent=r.ref; $('ref').classList.add('show');
     $('f').reset(); $('date').value=today(); showDate(); $('cnt').textContent='0';
     document.querySelectorAll('.type-opt').forEach(l=>l.classList.remove('checked'));
-    $('ref').scrollIntoView({behavior:'smooth',block:'center'});
+    say('تم استلام رسالتك بنجاح. شكرًا لمشاركتك.','ok');
+    $('msg').scrollIntoView({behavior:'smooth',block:'center'});
   }catch{ say('تعذّر الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.','err'); }
   finally{ $('btn').disabled=false; $('btn').textContent='إرسال الرسالة'; }
 });

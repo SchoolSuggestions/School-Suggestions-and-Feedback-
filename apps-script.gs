@@ -3,14 +3,14 @@
  * يُلصق كاملاً في Apps Script المرتبط بجدول Google Sheets جديد.
  * بعد أي تعديل: Deploy > Manage deployments > القلم > Version: New version > Deploy
  */
-const ACCESS_KEY = 'hayat1school'  
+const ACCESS_KEY = 'hayat1school';   // رمز دخول اللوحة
 const ALERT_EMAIL = 'tootaa.b.o.j@gmail.com';
 const SHEET_NAME = 'Messages';
 const DRIVE_FOLDER_NAME = 'مرفقات الاقتراحات والشكاوى';
 const SCHOOLS = ['المتوسطة التاسعة والستون', 'المتوسطة الثانية لتحفيظ القرآن'];
 const TYPES = ['شكوى', 'اقتراح'];
 const MAX_TEXT = 2000;
-// الأعمدة: 0 الوقت | 1 التاريخ | 2 المدرسة | 3 النوع | 4 التصنيف | 5 ولي الأمر | 6 التواصل | 7 النص | 8 المرفق | 9 الرقم المرجعي | 10 الحالة | 11 ملاحظة
+// الأعمدة: 0 الوقت | 1 التاريخ | 2 المدرسة | 3 النوع | 4 التصنيف | 5 ولي الأمر | 6 التواصل | 7 النص | 8 المرفق | 9 المعرف الداخلي | 10 الحالة | 11 ملاحظة
 
 function doPost(e) {
   try {
@@ -34,7 +34,7 @@ function doPost(e) {
     }
 
     // رسالة جديدة
-    if (d.website) return out({ status: 'ok', ref: 'XXXXXXXX' }); // فخ للروبوتات
+    if (d.website) return out({ status: 'ok' }); // فخ للروبوتات
     const text = String(d.text || '').trim();
     if (SCHOOLS.indexOf(d.school) < 0 || TYPES.indexOf(d.type) < 0 || !d.date || text.length < 10) {
       return out({ status: 'invalid' });
@@ -46,20 +46,19 @@ function doPost(e) {
     if (last > 1 && sheet.getRange(last, 8).getValue() === text.slice(0, MAX_TEXT)) return out({ status: 'duplicate' });
 
     const fileUrl = (d.fileBase64 && d.fileName) ? saveFile(d.fileBase64, d.fileName, d.fileMime) : '';
-    const ref = Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase();
+    const rowId = Utilities.getUuid().replace(/-/g, '').slice(0, 8).toUpperCase();
     sheet.appendRow([new Date(), '', d.school, d.type, d.category || '', String(d.parentName || '').slice(0, 80),
-      '', text.slice(0, MAX_TEXT), fileUrl, ref, 'new', '']);
+      '', text.slice(0, MAX_TEXT), fileUrl, rowId, 'new', '']);
     const r = sheet.getLastRow();
     // تثبيت التاريخ ورقم التواصل كنص حتى لا يحوّلها Sheets
     sheet.getRange(r, 2).setNumberFormat('@STRING@').setValue(d.date);
     sheet.getRange(r, 7).setNumberFormat('@STRING@').setValue(String(d.contact || '').slice(0, 30));
 
     if (d.type === 'شكوى') {
-      MailApp.sendEmail(ALERT_EMAIL, 'شكوى جديدة — ' + d.school + ' — ' + ref,
-        'وصلت شكوى جديدة إلى ' + d.school + '\nالرقم المرجعي: ' + ref +
-        '\nالتصنيف: ' + (d.category || 'غير محدد') + '\n\nيرجى مراجعة لوحة الإرشاد الطلابي.');
+      MailApp.sendEmail(ALERT_EMAIL, 'شكوى جديدة — ' + d.school,
+        'وصلت شكوى جديدة إلى ' + d.school + '\nالتصنيف: ' + (d.category || 'غير محدد') + '\n\nيرجى مراجعة لوحة التوجيه الطلابي.');
     }
-    return out({ status: 'ok', ref: ref });
+    return out({ status: 'ok' });
   } catch (err) {
     return out({ status: 'error', message: String(err) });
   }
@@ -79,7 +78,7 @@ function getSheet() {
   let s = ss.getSheetByName(SHEET_NAME);
   if (!s) {
     s = ss.insertSheet(SHEET_NAME);
-    s.appendRow(['الوقت', 'التاريخ', 'المدرسة', 'النوع', 'التصنيف', 'ولي الأمر', 'التواصل', 'النص', 'رابط المرفق', 'الرقم المرجعي', 'الحالة', 'ملاحظة']);
+    s.appendRow(['الوقت', 'التاريخ', 'المدرسة', 'النوع', 'التصنيف', 'ولي الأمر', 'التواصل', 'النص', 'رابط المرفق', 'المعرف', 'الحالة', 'ملاحظة']);
   }
   return s;
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex,nofollow" />
-<title>لوحة الإرشاد الطلابي — الاقتراحات والشكاوى</title>
+<title>لوحة التوجيه الطلابي — الاقتراحات والشكاوى</title>
 <link rel="stylesheet" href="style.css" />
 <link rel="stylesheet" href="theme.css" />
 </head>
@@ -15,7 +15,7 @@
     <div class="letterhead-text">
       <div class="kicker">المملكة العربية السعودية · وزارة التعليم</div>
       <h1>لوحة الاقتراحات والشكاوى</h1>
-      <p>خاصة بالإرشاد الطلابي — غير مخصصة لأولياء الأمور</p>
+      <p>خاصة بالتوجيه الطلابي — غير مخصصة لأولياء الأمور</p>
     </div>
   </div></div>
 
@@ -35,7 +35,7 @@
       <div class="stat-card"><div class="value" id="s-all">—</div><div class="label">إجمالي الرسائل</div></div>
     </div>
     <div class="filters-row">
-      <input type="text" id="q" placeholder="بحث في النص أو الرقم المرجعي..." />
+      <input type="text" id="q" placeholder="بحث في نص الرسائل..." />
       <select id="fSchool"><option value="">كل المدارس</option><option>المتوسطة التاسعة والستون</option><option>المتوسطة الثانية لتحفيظ القرآن</option></select>
       <select id="fType"><option value="">الكل</option><option>شكوى</option><option>اقتراح</option></select>
       <select id="fStatus"><option value="">كل الحالات</option><option value="new">جديدة</option><option value="progress">قيد المعالجة</option><option value="done">تمت المعالجة</option></select>
@@ -86,7 +86,7 @@ function render(){
   $('s-sug').textContent=all.filter(r=>r.type==='اقتراح').length;
   $('s-all').textContent=all.length;
   const q=$('q').value.trim(), s=$('fSchool').value, t=$('fType').value, st=$('fStatus').value;
-  let rows=all.filter(r=>(!s||r.school===s)&&(!t||r.type===t)&&(!st||r.status===st)&&(!q||(r.text+r.id+r.parentName).includes(q)));
+  let rows=all.filter(r=>(!s||r.school===s)&&(!t||r.type===t)&&(!st||r.status===st)&&(!q||(r.text+r.parentName).includes(q)));
   rows.sort((a,b)=>(a.status==='done')-(b.status==='done')||String(b.date).localeCompare(String(a.date)));
   if(!all.length){ $('list').innerHTML='<div class="empty-state"><b>لا توجد رسائل بعد</b><br>ستظهر هنا فور وصولها.</div>'; return; }
   if(!rows.length){ $('list').innerHTML='<div class="empty-state">لا نتائج مطابقة. يمكن تعديل البحث أو الفلاتر.</div>'; return; }
@@ -101,7 +101,7 @@ function render(){
           ${r.category?`<span class="tag">${esc(r.category)}</span>`:''}
         </div>
         <p class="preview">${esc(r.text.length>110?r.text.slice(0,110)+'…':r.text)}</p>
-        <div class="meta">${esc(r.date)} · رقم: ${esc(r.id)}</div>
+        <div class="meta">${esc(r.date)}</div>
       </div>
       <span class="st ${r.status}">${ST[r.status]||r.status}</span>
     </div>
