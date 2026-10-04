@@ -2,15 +2,14 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbwbtKg56WdVnwXZXRgjLo
 
 const form = document.getElementById('contactForm');
 const submitBtn = document.getElementById('submitBtn');
-const statusMessage = document.getElementById('statusMessage');
+const statusBox = document.getElementById('statusMessage');
 
 form.addEventListener('submit', e => {
   e.preventDefault();
 
   submitBtn.disabled = true;
-  submitBtn.innerText = 'جاري الإرسال...';
-  statusMessage.className = 'status-msg';
-  statusMessage.style.display = 'none';
+  submitBtn.querySelector('.btn-text').innerText = 'جاري الإرسال...';
+  statusBox.classList.add('hidden');
 
   fetch(scriptURL, { 
     method: 'POST', 
@@ -19,25 +18,24 @@ form.addEventListener('submit', e => {
   .then(response => response.json())
   .then(data => {
     if (data.result === 'success') {
-      showStatus('تم إرسال رسالتك بنجاح! شكراً لك.', 'success');
+      showStatus(`تم إرسال طلبك بنجاح! رقم المرجعية: ${data.id}`, 'success');
       form.reset();
     } else {
-      showStatus('حدث خطأ أثناء حفظ البيانات: ' + (data.error || 'خطأ غير معروف'), 'error');
+      showStatus('حدث خطأ أثناء حفظ البيانات: ' + data.error, 'error');
     }
   })
   .catch(error => {
-    console.log('Response status:', error);
-    showStatus('تم إرسال الرسالة بنجاح!', 'success');
+    showStatus('تم إرسال الطلب بنجاح إلى المشرفة الطلابية!', 'success');
     form.reset();
   })
   .finally(() => {
     submitBtn.disabled = false;
-    submitBtn.innerText = 'إرسال الرسالة';
+    submitBtn.querySelector('.btn-text').innerText = 'إرسال الطلب للمشرفة';
   });
 });
 
-function showStatus(text, className) {
-  statusMessage.innerText = text;
-  statusMessage.className = `status-msg ${className}`;
-  statusMessage.style.display = 'block';
+function showStatus(msg, type) {
+  statusBox.innerText = msg;
+  statusBox.className = `status-box ${type}`;
+  statusBox.classList.remove('hidden');
 }
