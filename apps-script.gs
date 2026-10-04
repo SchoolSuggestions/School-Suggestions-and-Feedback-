@@ -3,8 +3,8 @@
  * يُلصق كاملاً في Apps Script المرتبط بجدول Google Sheets جديد.
  * بعد أي تعديل: Deploy > Manage deployments > القلم > Version: New version > Deploy
  */
-const ACCESS_KEY = 'غيّر_هذا_الرمز';   // رمز دخول اللوحة — يُختار رمز جديد وقوي
-const ALERT_EMAIL = 'ضع_البريد_هنا@gmail.com';
+const ACCESS_KEY = 'hayat1school'  
+const ALERT_EMAIL = 'tootaa.b.o.j@gmail.com';
 const SHEET_NAME = 'Messages';
 const DRIVE_FOLDER_NAME = 'مرفقات الاقتراحات والشكاوى';
 const SCHOOLS = ['المتوسطة التاسعة والستون', 'المتوسطة الثانية لتحفيظ القرآن'];
